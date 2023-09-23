@@ -30,7 +30,7 @@ It might be easier to understand when compared to REST API.
 
 In a traditional REST API, there are endpoints that provide access to a resource (i.e., `/api/users`), and those endpoints have methods associated for managing that resource (i.e. `POST /api/users` might create a user). Endpoints (typically) respond with well-known JSON response bodies.
 
-In GraphQL, there's a single endpoint which accepts "queries" and "mutations". Queries are akin to a `GET` request, while a mutation is like a `POST`, `PUT`, `PATCH`, or `DELETE`. Instead of querying or mutation an endpoint, a client will query or mutate one or many resource(s) like a `User`.
+In GraphQL, there's a single endpoint which accepts "queries" and "mutations". Queries are akin to a `GET` request, while a mutation is like a `POST`, `PUT`, `PATCH`, or `DELETE`. Instead of querying or mutating an endpoint, a client will query or mutate one or many resource(s) like a `User`.
 
 
 Here's an example that might be helpful - loading a user by username from the API.
