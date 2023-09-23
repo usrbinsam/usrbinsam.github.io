@@ -140,6 +140,8 @@ On a new project, I think GraphQL is a fine choice, but I wouldn't run it on Fas
 
 Does it matter? Maybe. Because the database is the primary bottleneck, you don't get *that much* of a performance increase with GraphQL, especially when you can use browser APIs like [`Promise.allSettled()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/allSettled). GraphQL may even be slower than a well built asynchronous REST API.
 
+But I don't know your use-case, so you should perform the right research as I have done to evaluate if it is right for you.
+
 ## Final thoughts
 
 For an established and well-oiled FastAPI project, GraphQL does not give us a productive advantage. In fact, it requires us to either abandon or kludge many of the features that makes FastAPI so attractive.
