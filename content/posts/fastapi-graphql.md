@@ -15,9 +15,9 @@ FastAPI works well for us for many reasons, but the top 3 are:
 2. Dependency injection
 3. Automatic Swagger documentation
 
-FastAPI gave us a huge productivity and code quality boost. Coming from a frameworkless PHP  backend, pretty much *anything* would've given us a productivity boost.
+FastAPI gives us a huge productivity and code quality boost. Coming from a frameworkless PHP  backend, pretty much *anything* would give us a productivity boost.
 
-Recently, I evaluted if GraphQL would be a good fit for our platform. I wanted to know if traditional way a REST API is built was slowing us down on the frontend or on the backend. My conclusiion was overwhelmingly: no. GraphQL is not a good fit for us, and I'll explain why.
+Recently, I evaluted if GraphQL would be a good fit for our platform. I wanted to know if the traditional way a REST API is built was slowing us down. My conclusion was overwhelmingly: no. GraphQL is not a good fit for us, and I'll explain why.
 
 
 ## GraphQL
@@ -105,11 +105,13 @@ And the response looks like:
 }
 ```
 
+I could go into how this looks in code, but that is dependent on which GraphQL implementation you choose.
+
 ## The Problem
 
-I don't have a problem with GraphQL at all. It is a very powerful utility, and I would like to work on a GraphQL application one day. When the opportunity comes, I may even build one.
+I don't have a problem with GraphQL at all. It is a very powerful tool, and I would like to work on a GraphQL application one day. If the opportunity comes, I might even build one.
 
-However, if you're already on FastAPI, I don't see much advantage to adding GraphQL to the stack.
+However, if you're already on FastAPI, I don't see much advantage to adding GraphQL to your stack.
 
 
 ### Input Validation
@@ -132,14 +134,20 @@ In the GraphQL example above we omitted the `admin` property from the user query
 
 This is not a huge issue but I suspect it would lead to widespread over-selecting throughout a large codebase.
 
+## Should you though? Does it matter?
+
+On a new project, I think GraphQL is a fine choice, but I wouldn't run it on FastAPI.
+
+Does it matter? Maybe. Because the database is the primary bottleneck, you don't get *that much* of a performance increase with GraphQL, especially when you can use browser APIs like [`Promise.allSettled()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/allSettled). GraphQL may even be slower than a well built asynchronous REST API.
+
 ## Final thoughts
 
 For an established and well-oiled FastAPI project, GraphQL does not give us a productive advantage. In fact, it requires us to either abandon or kludge many of the features that makes FastAPI so attractive.
 
 In fact, there's even a [callout](https://github.com/tiangolo/fastapi/blob/69a7c99b447c9ef103dc03e93d172cabd99ac832/docs/en/docs/how-to/graphql.md?plain=1#L7-L12) in FastAPI's page about GraphQL that cautions readers to evaluate their use case for GraphQL.
 
-I'd love to see a tighter integration between FastAPI & Strawberry that allows developers to use their existing Pydantic models with full validation and better dependency injection support, but I won't have my fingers crossed.
+I'd love to see a tighter integration between FastAPI & strawberry that allows developers to use their existing Pydantic models with full validation support and better dependency injection support, but I don't have my fingers crossed.
 
-If you wan't to use GraphQL, I don't think FastAPI is the way to go about it.
+If you want to use GraphQL, I don't think FastAPI is the way to go about it.
 
-Did I miss anything? Did I get anything wrong? Feel free to send feeback to [sam@redeemed.dev](mailto:sam@redeemed.dev).
+Did I miss anything? Did I get anything wrong? Are you using GraphQL with FastAPI in production? Feel free to send feeback to [sam@redeemed.dev](mailto:sam@redeemed.dev).
