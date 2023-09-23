@@ -105,7 +105,7 @@ And the response looks like:
 }
 ```
 
-I could go into how this looks in code, but that is dependent on which GraphQL implementation you choose.
+I could go into how this looks in code, but that is dependent on which GraphQL implementation you choose. This also isn't a post about what GraphQL can & cannot do. The above example is very trivial and barely scratches the surface of GraphQL's capabilities. Have a look at their [docs](https://graphql.org/learn/) for a more in-depth look. 
 
 ## The Problem
 
