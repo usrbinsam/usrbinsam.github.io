@@ -1,0 +1,5 @@
+baseURL = 'https://www.redeemed.dev/'
+languageCode = 'en-us'
+title = 'Sam Hoffman'
+theme = 'hugo-theme-monochrome'
+enableRobotsTXT = true
