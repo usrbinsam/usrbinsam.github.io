@@ -1,5 +1,8 @@
-baseURL = 'https://www.redeemed.dev/'
+baseURL = 'https://redeemed.dev/'
 languageCode = 'en-us'
 title = 'Sam Hoffman'
 theme = 'hugo-theme-monochrome'
 enableRobotsTXT = true
+
+[params]
+author = "Samuel J. Hoffman"

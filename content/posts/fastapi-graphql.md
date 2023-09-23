@@ -1,34 +1,145 @@
 +++
-title = 'FastAPI & GraphQL'
+title = 'Should I use GraphQL with FastAPI?'
 date = 2023-09-22T23:46:51-04:00
-draft = true
+draft = false
+tags = ['graphql', 'fastapi']
 +++
+
+# FastAPI and GraphQL
+
 At work, we use [FastAPI](https://fastapi.tiangolo.com/).
 
-One of the features we lean on most heavily is FastAPI's ability to auto-validate request (and response) parameters. This helps our small team rapidly build out projects without manually validating user input parameters.
+FastAPI works well for us for many reasons, but the top 3 are:
 
-I recently took the time to evaluate if GraphQL would be a useful addon that could boost productivity. FastAPI's touts support for GraphQL and recommends Strawberry.
+1. Extremely robust request parameter validation with Pydantic
+2. Dependency injection
+3. Automatic Swagger documentation
 
-I built a simple Query for loading user-account information through the GraphQL endpoint. By the time I had written the first query, I realized that GraphQL support in FastAPI just seems like a "look what we can do!" feature. Here's why ...
+FastAPI gave us a huge productivity and code quality boost. Coming from a frameworkless PHP  backend, pretty much *anything* would've given us a productivity boost.
 
-FastAPI's tight integration with Pydantic gives it a huge advantage in building a REST API without making the developer fuss over input validation, and allows them to get straight to writing business logic. When you add in GraphQL, you lose this feature, somewhat defeating the purpose of being on FastAPI in the first place.
+Recently, I evaluted if GraphQL would be a good fit for our platform. I wanted to know if traditional way a REST API is built was slowing us down on the frontend or on the backend. My conclusiion was overwhelmingly: no. GraphQL is not a good fit for us, and I'll explain why.
 
-A neat feature of GraphQL is the ability to select individual fields of a type. In my test setup the account query returns the user's ID, username, and several other important pieces of information the frontend will need. If a query on the frontend determines it *only* needs a subset of those fields, it can tell GraphQL only to respond with those fields. This de-couples the frontend & backend too much and creates the ability to overquery.
 
-Here's what I mean ...
+## GraphQL
 
-In my standard FastAPI user account info, we return a JSON object that looks something like this:
+What is GraphQL? Here's the exceprt from [graphql.org](https://graphql.org/):
 
+> GraphQL is a query language for APIs and a runtime for fulfilling those queries with your existing data. GraphQL provides a complete and understandable description of the data in your API, gives clients the power to ask for exactly what they need and nothing more, makes it easier to evolve APIs over time, and enables powerful developer tools.
+
+It might be easier to understand when compared to REST API.
+
+In a traditional REST API, there are endpoints that provide access to a resource (i.e., `/api/users`), and those endpoints have methods associated for managing that resource (i.e. `POST /api/users` might create a user). Endpoints (typically) respond with well-known JSON response bodies.
+
+In GraphQL, there's a single endpoint which accepts "queries" and "mutations". Queries are akin to a `GET` request, while a mutation is like a `POST`, `PUT`, `PATCH`, or `DELETE`. Instead of querying or mutation an endpoint, a client will query or mutate one or many resource(s) like a `User`.
+
+
+Here's an example that might be helpful - loading a user by username from the API.
+
+With a REST API, if I request `GET /api/user/james` from the server to get the logged-in user's identity, it will respond with something like:
 ```json
 {
-    "id": 1821,
-    "username": "sam",
-    "avatar": "https://example.com/avatar.png",
-    "roles": ["admin", "billing", "forum"],
+    "id": 1,
+    "username": "james",
     "status": "ACTIVE",
-    "firstName": "Samuel",
-    "lastName": "Hoffman"
+    "admin": true
 }
 ```
 
-Our SQLAlchemy query selects from the `users` table for most of this information and joins to the `roles` table.
+The equivalent request in GraphQL looks like this:
+```graphql
+{
+    user(username: "james") {
+        id
+        username
+        status
+    }
+}
+```
+
+And the response looks like this:
+
+```json
+{
+    "user": {
+        "id": 1,
+        "username": "james",
+        "status": "ACTIVE"
+    }
+}
+```
+
+Notice in the GraphQL example, the `admin` property is not there. That is because it wasn't included in the original query. Only `id`, `username`, and `status` were queried. This is quite useful - the client can request individual fields from the API!
+
+Another advantage with GraphQL is that it can run multiple queries in a single request. For example, if I want to query my REST API for two users, I have to run the request twice: `GET /api/users/james` and `GET /api/users/jeff`. GraphQL allows the client to request multiple resources in a single query:
+
+```graphql
+
+{
+    jeff: user(username: "jeff") {
+        id
+        username
+        status
+    }
+    james: user(username: "james") {
+        id
+        username
+        status
+    }
+}
+```
+
+And the response looks like:
+
+```json
+{
+    "jeff": {
+        "id": 2,
+        "username": "jeff",
+        "status": "ACTIVE"
+    },
+    "james": {
+        "id": 1,
+        "username": "james",
+        "status": "ACTIVE"
+    }
+}
+```
+
+## The Problem
+
+I don't have a problem with GraphQL at all. It is a very powerful utility, and I would like to work on a GraphQL application one day. When the opportunity comes, I may even build one.
+
+However, if you're already on FastAPI, I don't see much advantage to adding GraphQL to the stack.
+
+
+### Input Validation
+
+FastAPI ships with a powerful input validation system using Pydantic. If we were to add GraphQL to our stack, we'd have to re-implement our Pydantic models as types in our GraphQL library of choice.
+
+[strawberry](https://strawberry.rocks/docs/integrations/pydantic#pydantic-support) has experimental support for Pydantic, but still requires a wrapper types for each model before adding it to GraphQL's schema. You can't use Pydantic types directly. Sure, there are some other libraries out there that try to do this, but none seem to have much traction today.
+
+### Dependency Injection
+
+FastAPI's dependency injection system helps immensely with code deduplication, performance, and code readability.
+
+strawberry's [context_getter](https://strawberry.rocks/docs/integrations/fastapi#context_getter) allows for using FastAPI's dependency injection, but it does not allow each resolver/field to specify which dependencies it needs. This means all operations share the same dependencies, or you just define your most common dependencies and let each operation allocate the dependencies it needs.
+
+### SQLAlchemy
+
+Over-selecting.
+
+In the GraphQL example above we omitted the `admin` property from the user query. At face value, this seems very useful. The frontend is able to select the fields it needs from the user. However, this does not propagate down to the query language. Our ORM loaded all of user columns from the database and returned them to GraphQL, but GraphQL only responded with the fields that the user selected.
+
+This is not a huge issue but I suspect it would lead to widespread over-selecting throughout a large codebase.
+
+## Final thoughts
+
+For an established and well-oiled FastAPI project, GraphQL does not give us a productive advantage. In fact, it requires us to either abandon or kludge many of the features that makes FastAPI so attractive.
+
+In fact, there's even a [callout](https://github.com/tiangolo/fastapi/blob/69a7c99b447c9ef103dc03e93d172cabd99ac832/docs/en/docs/how-to/graphql.md?plain=1#L7-L12) in FastAPI's page about GraphQL that cautions readers to evaluate their use case for GraphQL.
+
+I'd love to see a tighter integration between FastAPI & Strawberry that allows developers to use their existing Pydantic models with full validation and better dependency injection support, but I won't have my fingers crossed.
+
+If you wan't to use GraphQL, I don't think FastAPI is the way to go about it.
+
+Did I miss anything? Did I get anything wrong? Feel free to send feeback to [sam@redeemed.dev](mailto:sam@redeemed.dev).
