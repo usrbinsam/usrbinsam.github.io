@@ -2,7 +2,7 @@
 title = 'Should I use GraphQL with FastAPI?'
 date = 2023-09-22T23:46:51-04:00
 draft = false
-tags = ['graphql', 'fastapi']
+tags = ['graphql', 'fastapi', 'python']
 +++
 
 # FastAPI and GraphQL
@@ -151,5 +151,3 @@ In fact, there's even a [callout](https://github.com/tiangolo/fastapi/blob/69a7c
 I'd love to see a tighter integration between FastAPI & strawberry that allows developers to use their existing Pydantic models with full validation support and better dependency injection support, but I don't have my fingers crossed.
 
 If you want to use GraphQL, I don't think FastAPI is the way to go about it.
-
-Did I miss anything? Did I get anything wrong? Are you using GraphQL with FastAPI in production? Feel free to send feeback to [sam@redeemed.dev](mailto:sam@redeemed.dev).
